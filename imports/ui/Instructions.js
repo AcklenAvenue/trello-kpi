@@ -12,11 +12,11 @@ export default class Instructions extends React.Component {
           <div id="instructions" className="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 text-center">
             <div className="panel panel-default panel-success ">
               <div className="panel-heading">Get your KEY</div>
-              <div className="panel-body">You can get your key <a href="https://trello.com/app-key" target="_blank">here</a>.</div>
+              <div className="panel-body">You can get your key <a href="https://trello.com/app-key" target="_blank">here</a>. Save it somewhere.</div>
             </div>
             <div className="panel panel-default panel-success ">
               <div className="panel-heading">Get your TOKEN</div>
-              <div className="panel-body">You can get your token <a href="https://trello.com/1/authorize?expiration=never&scope=read,write,account&response_type=token&name=Server%20Token&key=ac95fa0d46829f2504dce21cc8d1cf13" target="_blank">here</a>.</div>
+              <div className="panel-body">You can get your token <a href="https://trello.com/1/authorize?expiration=never&scope=read,write,account&response_type=token&name=Server%20Token&key=ac95fa0d46829f2504dce21cc8d1cf13" target="_blank">here</a>. Save it somewhere.</div>
             </div>
             <div className="panel panel-default panel-success ">
               <div className="panel-heading">Current</div>
