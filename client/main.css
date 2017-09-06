@@ -1,0 +1,38 @@
+/* CSS declarations go here */
+#main {
+  height: 90vh;
+  position: relative;
+}
+
+#main h2{
+  position: relative;
+  text-align: center;
+  top: 12.5%;
+}
+
+#input {
+  position: absolute;
+  top: 25%;
+}
+
+.panel {
+  position: relative;
+  top: 20%;
+}
+
+#instructions-main {
+  height: 90vh;
+  position: relative;
+}
+
+#instructions-main h2{
+  position: relative;
+  text-align: center;
+  top: 5%;
+}
+
+#instructions {
+  text-align: left;
+  position: relative;
+  top: 10%;
+}
