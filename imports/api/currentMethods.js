@@ -4,7 +4,7 @@ import json2csv from 'json2csv';
 import { Trello } from './trello';
 
 Meteor.methods({
-  async getBoardName(key, token, boardId) {
+  async getBoardNameCurrent(key, token, boardId) {
     const response = await Trello.getBoardName(key, token, boardId);
     const boards = response.data;
     let boardName = '';

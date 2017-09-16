@@ -11,7 +11,7 @@ export default class TrelloRequestCurrent extends React.Component {
 
     if (key && token && boardId) {
       Meteor.call('getCards', key, token, boardId, (err, csv) => {
-        Meteor.call('getBoardName', key, token, boardId, (err, boardName) => {
+        Meteor.call('getBoardNameCurrent', key, token, boardId, (err, boardName) => {
           let file = new File([csv], `${boardName}.csv`, {type: "text/plain;charset=utf-8"});
           FileSaver.saveAs(file);
         });

@@ -10,10 +10,14 @@ export default class TrelloRequestHistory extends React.Component {
     e.preventDefault();
 
     if (key && token && boardId) {
+      Meteor.call('getCardIdsAndNames', key, token, boardId, (err, ids) => {
+        console.log(ids);
+      });
       this.refs.key.value = '';
       this.refs.token.value = '';
       this.refs.boardId.value = '';
     }
+
   };
   render() {
     return (
