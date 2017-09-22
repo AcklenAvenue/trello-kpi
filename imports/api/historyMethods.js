@@ -44,7 +44,6 @@ Meteor.methods({
     let actions = {
       "date": response.date,
       cardId,
-
     };
     return response;
   }

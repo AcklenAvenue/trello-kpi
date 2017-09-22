@@ -20,7 +20,7 @@ export default class Instructions extends React.Component {
             </div>
             <div className="panel panel-default panel-success ">
               <div className="panel-heading">Current</div>
-              <div className="panel-body">Once the correct data is input, it will generate a file with the current cards with the following fields: 'listId', 'listName', 'cardId', 'cardName', and 'labels'.</div>
+              <div className="panel-body">Once the correct data is input, it will generate a file with the current cards with the following fields: 'listId', 'listName', 'cardId', 'cardName', 'labels', 'due', and 'dueComplete'.</div>
             </div>
             <div className="panel panel-default panel-success ">
               <div className="panel-heading">History</div>

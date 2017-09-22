@@ -36,11 +36,13 @@ Meteor.methods({
           "listName": list.name,
           "cardId": card.id,
           "cardName": card.name,
-          "labels": labelsString
+          "labels": labelsString,
+          "due": card.due,
+          "dueComplete": card.dueComplete
         });
       })
     });
-    const fields = ['listId', 'listName', 'cardId', 'cardName', 'labels'];
+    const fields = ['listId', 'listName', 'cardId', 'cardName', 'labels', 'due', 'dueComplete'];
     const csv = json2csv({ data, fields });
     return csv;
   }
