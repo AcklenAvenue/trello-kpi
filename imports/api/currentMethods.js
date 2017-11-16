@@ -3,7 +3,6 @@ import json2csv from 'json2csv';
 import projects from '../../projects.json';
 
 import { Trello } from './trello';
-import { Sheets } from './googleSheets';
 
 const google = require('googleapis');
 
