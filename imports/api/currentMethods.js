@@ -87,9 +87,10 @@ Meteor.methods({
 
       sheets.spreadsheets.get({
         spreadsheetId: project[0].sheetId,
-        includeGridData: true,
         auth: oauth2Client
       }, function (err, document) {
+        console.log(err);
+        console.log('request 1 success');
         // Retrieve data about current Sheet
         const documentSheets = document.sheets;
         const nowdate = moment().format('MM-DD-YYYY');
@@ -114,7 +115,7 @@ Meteor.methods({
 
           if(title.includes('Evolution')){
             evoId = sheet.properties.sheetId;
-            evoColumnIndex = sheet.data[0].rowData[0].values.length;
+            // evoColumnIndex = sheet.data[0].rowData[0].values.length;
           }
         });
 
@@ -124,68 +125,88 @@ Meteor.methods({
           return;
         }
 
-        // Update current document
-        sheets.spreadsheets.batchUpdate({
+        sheets.spreadsheets.values.batchGetByDataFilter({
           spreadsheetId: project[0].sheetId,
           auth: oauth2Client,
           resource: {
-            "requests": [
+            "dataFilters": [
               {
-                "duplicateSheet": {
-                  "insertSheetIndex": lastIndex + 1,
-                  "newSheetName": "As of " + nowdate,
-                  "sourceSheetId": lastId
-                }
-              },
-              {
-                "insertDimension": {
-                  "range": {
-                    "sheetId": evoId,
-                    "dimension": "COLUMNS",
-                    "startIndex": evoColumnIndex,
-                    "endIndex": evoColumnIndex + 1
-                  },
-                  "inheritFromBefore": true
+                "gridRange": {
+                  "sheetId": evoId,
+                  "startColumnIndex": 0,
+                  "startRowIndex": 0,
+                  "endRowIndex": 1
                 }
               }
             ]
-          },
-        }, function(err, success){
+          }
+        }, function (err, res) {
           console.log(err);
-          console.log('success 1 in request');
-
-          sheets.spreadsheets.values.batchUpdateByDataFilter({
+          console.log('request 2 success');
+          evoColumnIndex = res.valueRanges[0].valueRange.values[0].length;
+          // Update current document
+          sheets.spreadsheets.batchUpdate({
             spreadsheetId: project[0].sheetId,
             auth: oauth2Client,
             resource: {
-              "data": [
+              "requests": [
                 {
-                  "dataFilter": {
-                    "gridRange": {
+                  "duplicateSheet": {
+                    "insertSheetIndex": lastIndex + 1,
+                    "newSheetName": "As of " + nowdate,
+                    "sourceSheetId": lastId
+                  }
+                },
+                {
+                  "insertDimension": {
+                    "range": {
                       "sheetId": evoId,
-                      "startColumnIndex": evoColumnIndex,
-                      "startRowIndex": 0
-                    }
-                  },
-                  "values": [
-                    [
-                      "EEESSSSAAA"
-                    ],
-                    [
-                      "Estoooo"
-                    ]
-                  ]
+                      "dimension": "COLUMNS",
+                      "startIndex": evoColumnIndex,
+                      "endIndex": evoColumnIndex + 1
+                    },
+                    "inheritFromBefore": true
+                  }
                 }
-              ],
-              "valueInputOption": "RAW"
-            }
+              ]
+            },
           }, function(err, success){
             console.log(err);
-            console.log('success 2 in request');
+            console.log('request 3 success');
+
+            sheets.spreadsheets.values.batchUpdateByDataFilter({
+              spreadsheetId: project[0].sheetId,
+              auth: oauth2Client,
+              resource: {
+                "data": [
+                  {
+                    "dataFilter": {
+                      "gridRange": {
+                        "sheetId": evoId,
+                        "startColumnIndex": evoColumnIndex,
+                        "startRowIndex": 0
+                      }
+                    },
+                    "values": [
+                      [
+                        "EEESSSSAAA"
+                      ],
+                      [
+                        "Estoooo"
+                      ]
+                    ]
+                  }
+                ],
+                "valueInputOption": "RAW"
+              }
+            }, function(err, success){
+              console.log(err);
+              console.log('request 4 success');
+            })
+            // const newSheetId = success.replies[0].duplicateSheet.properties.sheetId;
+            // Add new request to CLEAN and write CSV in this new sheet
+            // Write CSV data in column L4
           })
-          // const newSheetId = success.replies[0].duplicateSheet.properties.sheetId;
-          // Add new request to CLEAN and write CSV in this new sheet
-          // Write CSV data in column L4
         })
       });
     });
