@@ -11,6 +11,7 @@
     "googleapis": "^22.2.0",
     "json2csv": "^3.11.1",
     "meteor-node-stubs": "~0.2.4",
+    "moment": "^2.19.2",
     "react": "^15.3.2",
     "react-dom": "^15.3.2",
     "react-router": "^3.0.5",

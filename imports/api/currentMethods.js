@@ -1,9 +1,9 @@
 import { Meteor } from 'meteor/meteor';
 import json2csv from 'json2csv';
 import projects from '../../projects.json';
-
 import { Trello } from './trello';
 
+const moment = require('moment');
 const google = require('googleapis');
 
 Meteor.methods({
@@ -49,7 +49,11 @@ Meteor.methods({
     const csv = json2csv({ data, fields });
     return csv;
   },
-  getCurrentSpreadSheet(boardId, code){
+  getCurrentSpreadSheet(boardId, code, csv){
+
+    if(!csv){
+      return;
+    }
 
     const sheets = google.sheets('v4');
     const OAuth2 = google.auth.OAuth2;
@@ -62,10 +66,10 @@ Meteor.methods({
     oauth2Client.getToken(code, function (err, tokens) {
       // Now tokens contains an access_token and an optional refresh_token. Save them.
       if (err) {
-        return err;
+        return;
       }
-      oauth2Client.setCredentials(tokens);
 
+      oauth2Client.setCredentials(tokens);
 
       let project = projects.filter( (project) => {
         return project.boardId === boardId;
@@ -73,19 +77,116 @@ Meteor.methods({
 
       if(!project[0]){
         console.log('noproject');
-        return false;
+        return;
       }
 
       if(!project[0].sheetId){
         console.log('nosheet');
-        return false
+        return;
       }
 
       sheets.spreadsheets.get({
         spreadsheetId: project[0].sheetId,
+        includeGridData: true,
         auth: oauth2Client
-      }, function (err, response) {
-        console.log(response);
+      }, function (err, document) {
+        // Retrieve data about current Sheet
+        const documentSheets = document.sheets;
+        const nowdate = moment().format('MM-DD-YYYY');
+        let exist = false;
+
+        let lastIndex = 0;
+        let lastId;
+
+        let evoId;
+        let evoColumnIndex;
+
+        documentSheets.forEach( (sheet) => {
+          let title = sheet.properties.title;
+          if(title.includes('As of ')){
+            lastIndex = documentSheets.indexOf(sheet); //Where create column
+            lastId = sheet.properties.sheetId;
+          }
+
+          if(title.includes(nowdate)){
+            exist = true;
+          }
+
+          if(title.includes('Evolution')){
+            evoId = sheet.properties.sheetId;
+            evoColumnIndex = sheet.data[0].rowData[0].values.length;
+          }
+        });
+
+        // Sheet already exist today, stop here
+        if(exist){
+          // EXIT
+          return;
+        }
+
+        // Update current document
+        sheets.spreadsheets.batchUpdate({
+          spreadsheetId: project[0].sheetId,
+          auth: oauth2Client,
+          resource: {
+            "requests": [
+              {
+                "duplicateSheet": {
+                  "insertSheetIndex": lastIndex + 1,
+                  "newSheetName": "As of " + nowdate,
+                  "sourceSheetId": lastId
+                }
+              },
+              {
+                "insertDimension": {
+                  "range": {
+                    "sheetId": evoId,
+                    "dimension": "COLUMNS",
+                    "startIndex": evoColumnIndex,
+                    "endIndex": evoColumnIndex + 1
+                  },
+                  "inheritFromBefore": true
+                }
+              }
+            ]
+          },
+        }, function(err, success){
+          console.log(err);
+          console.log('success 1 in request');
+
+          sheets.spreadsheets.values.batchUpdateByDataFilter({
+            spreadsheetId: project[0].sheetId,
+            auth: oauth2Client,
+            resource: {
+              "data": [
+                {
+                  "dataFilter": {
+                    "gridRange": {
+                      "sheetId": evoId,
+                      "startColumnIndex": evoColumnIndex,
+                      "startRowIndex": 0
+                    }
+                  },
+                  "values": [
+                    [
+                      "EEESSSSAAA"
+                    ],
+                    [
+                      "Estoooo"
+                    ]
+                  ]
+                }
+              ],
+              "valueInputOption": "RAW"
+            }
+          }, function(err, success){
+            console.log(err);
+            console.log('success 2 in request');
+          })
+          // const newSheetId = success.replies[0].duplicateSheet.properties.sheetId;
+          // Add new request to CLEAN and write CSV in this new sheet
+          // Write CSV data in column L4
+        })
       });
     });
   },
@@ -98,6 +199,7 @@ Meteor.methods({
       "http://localhost:3000"
     );
 
+    // Retrict request to acklenavenue domain
     // google.options({
     //   // auth: oauth2Client,
     //   hosted_domain: 'amazylia.com'
