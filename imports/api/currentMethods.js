@@ -175,6 +175,19 @@ Meteor.methods({
             console.log('request 3 success');
 
             const newSheetId = success.replies[0].duplicateSheet.properties.sheetId;
+            let csvLines = csv.split('\n');
+
+            let data = [];
+            for (var i=1; i<csvLines.length; i++)
+            {
+                const fields = csvLines[i].replace(/"/g,'').split(',');
+
+                const listName = fields[1];
+                const cardName = fields[3];
+                const labels = fields[4];
+
+                data.push([listName, cardName, labels]);
+            }
 
             sheets.spreadsheets.values.batchUpdateByDataFilter({
               spreadsheetId: project[0].sheetId,
@@ -182,6 +195,7 @@ Meteor.methods({
               resource: {
                 "data": [
                   {
+                    "majorDimension": "ROWS",
                     "dataFilter": {
                       "gridRange": {
                         "sheetId": evoId,
@@ -191,44 +205,15 @@ Meteor.methods({
                     },
                     "values": [
                       [
-                        "As of", "dos", "tres"
+                        "As of"
                       ],
                       [
                         nowdate
                       ]
                     ]
-                  }
-                ],
-                "valueInputOption": "RAW"
-              }
-            }, function(err, success){
-              console.log(err);
-              console.log('request 4 success');
-
-              console.log('BBBBBBBBBBBBBBBBBBBBBBBBB', typeof csv);
-              let csvLines = csv.split('\n');
-
-              let data = [];
-              
-              for (var i=1; i<csvLines.length; i++)
-              {
-                  const fields = csvLines[i].replace(/"/g,'').split(',');
-
-                  const listName = fields[1];
-                  const cardName = fields[3];
-                  const labels = fields[4];
-
-                  data.push([listName, cardName, labels]);
-              }
-
-              console.log(data);              
-
-              sheets.spreadsheets.values.batchUpdateByDataFilter({
-              spreadsheetId: project[0].sheetId,
-              auth: oauth2Client,
-              resource: {
-                "data": [
+                  },
                   {
+                    "majorDimension": "ROWS",
                     "dataFilter": {
                       "gridRange": {
                         "sheetId": newSheetId,
@@ -236,45 +221,15 @@ Meteor.methods({
                         "startRowIndex": 3
                       }
                     },
-                    "values":  [
-                      
-                        ["1","dos", "tres"],
-                        ["2","dos", "tres"],
-                        ["3","dos", "tres"],
-                        ["4","dos", "tres"],
-                        ["5","dos", "tres"],
-                        ["6","dos", "tres"],
-                        ["7","dos", "tres"],
-                        ["8","dos", "tres"],
-                        ["9","dos", "tres"],
-                        ["10","dos", "tres"],
-                        ["11","dos", "tres"],
-                        ["12","dos", "tres"],
-                        ["13","dos", "tres"],
-                        ["14","dos", "tres"],
-                        ["15","dos", "tres"],
-                        //["16","dos", "tres"],
-
-                      
-                      
-                      
-                      
-                       ]
+                    "values": data
                   }
                 ],
                 "valueInputOption": "RAW"
               }
             }, function(err, success){
-                console.log(err);
-                console.log('request 5 success');
-            });
-
-
-              //console.log(csv);
+              console.log(err);
+              console.log('request 4 success');
             })
-            // const newSheetId = success.replies[0].duplicateSheet.properties.sheetId;
-            // Add new request to CLEAN and write CSV in this new sheet
-            // Write CSV data in column L4
           })
         })
       });
