@@ -115,7 +115,6 @@ Meteor.methods({
 
           if(title.includes('Evolution')){
             evoId = sheet.properties.sheetId;
-            // evoColumnIndex = sheet.data[0].rowData[0].values.length;
           }
         });
 
@@ -143,8 +142,8 @@ Meteor.methods({
         }, function (err, res) {
           console.log(err);
           console.log('request 2 success');
+
           evoColumnIndex = res.valueRanges[0].valueRange.values[0].length;
-          // Update current document
           sheets.spreadsheets.batchUpdate({
             spreadsheetId: project[0].sheetId,
             auth: oauth2Client,
@@ -167,6 +166,23 @@ Meteor.methods({
                     },
                     "inheritFromBefore": true
                   }
+                },
+                {
+                  "copyPaste":
+                  {
+                    "source": {
+                      "sheetId": evoId,
+                      "startRowIndex": 2,
+                      "startColumnIndex": evoColumnIndex - 1,
+                      "endRowIndex": 21,
+                    },
+                    "destination": {
+                      "sheetId": evoId,
+                      "startRowIndex": 2,
+                      "startColumnIndex": evoColumnIndex,
+                      "endRowIndex": 21,
+                    },
+                  }
                 }
               ]
             },
@@ -175,60 +191,81 @@ Meteor.methods({
             console.log('request 3 success');
 
             const newSheetId = success.replies[0].duplicateSheet.properties.sheetId;
-            let csvLines = csv.split('\n');
 
-            let data = [];
-            for (var i=1; i<csvLines.length; i++)
-            {
-                const fields = csvLines[i].replace(/"/g,'').split(',');
-
-                const listName = fields[1];
-                const cardName = fields[3];
-                const labels = fields[4];
-
-                data.push([listName, cardName, labels]);
-            }
-
-            sheets.spreadsheets.values.batchUpdateByDataFilter({
+            sheets.spreadsheets.values.batchClearByDataFilter({
               spreadsheetId: project[0].sheetId,
               auth: oauth2Client,
               resource: {
-                "data": [
+                "dataFilters": [
                   {
-                    "majorDimension": "ROWS",
-                    "dataFilter": {
-                      "gridRange": {
-                        "sheetId": evoId,
-                        "startColumnIndex": evoColumnIndex,
-                        "startRowIndex": 0
-                      }
-                    },
-                    "values": [
-                      [
-                        "As of"
-                      ],
-                      [
-                        nowdate
-                      ]
-                    ]
-                  },
-                  {
-                    "majorDimension": "ROWS",
-                    "dataFilter": {
-                      "gridRange": {
-                        "sheetId": newSheetId,
-                        "startColumnIndex": 11,
-                        "startRowIndex": 3
-                      }
-                    },
-                    "values": data
+                    "gridRange": {
+                      "sheetId": newSheetId,
+                      "startColumnIndex": 11,
+                      "startRowIndex": 3,
+                      "endColumnIndex": 14
+                    }
                   }
-                ],
-                "valueInputOption": "RAW"
+                ]
               }
-            }, function(err, success){
+            }, function(err, success) {
               console.log(err);
               console.log('request 4 success');
+
+              let csvLines = csv.split('\n');
+
+              let data = [];
+              for (var i=1; i<csvLines.length; i++)
+              {
+                  const fields = csvLines[i].replace(/"/g,'').split(',');
+
+                  const listName = fields[1];
+                  const cardName = fields[3];
+                  const labels = fields[4];
+
+                  data.push([listName, cardName, labels]);
+              }
+
+              sheets.spreadsheets.values.batchUpdateByDataFilter({
+                spreadsheetId: project[0].sheetId,
+                auth: oauth2Client,
+                resource: {
+                  "data": [
+                    {
+                      "majorDimension": "ROWS",
+                      "dataFilter": {
+                        "gridRange": {
+                          "sheetId": evoId,
+                          "startColumnIndex": evoColumnIndex,
+                          "startRowIndex": 0
+                        }
+                      },
+                      "values": [
+                        [
+                          "As of"
+                        ],
+                        [
+                          nowdate
+                        ]
+                      ]
+                    },
+                    {
+                      "majorDimension": "ROWS",
+                      "dataFilter": {
+                        "gridRange": {
+                          "sheetId": newSheetId,
+                          "startColumnIndex": 11,
+                          "startRowIndex": 3
+                        }
+                      },
+                      "values": data
+                    }
+                  ],
+                  "valueInputOption": "RAW"
+                }
+              }, function(err, success){
+                console.log(err);
+                console.log('request 5 success');
+              })
             })
           })
         })
