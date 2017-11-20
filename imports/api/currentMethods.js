@@ -1,7 +1,10 @@
 import { Meteor } from 'meteor/meteor';
 import json2csv from 'json2csv';
-
+import projects from '../../projects.json';
 import { Trello } from './trello';
+
+const moment = require('moment');
+const google = require('googleapis');
 
 Meteor.methods({
   async getBoardNameCurrent(key, token, boardId) {
@@ -45,5 +48,250 @@ Meteor.methods({
     const fields = ['listId', 'listName', 'cardId', 'cardName', 'labels', 'due', 'dueComplete'];
     const csv = json2csv({ data, fields });
     return csv;
+  },
+  getCurrentSpreadSheet(boardId, code, csv){
+
+    if(!csv){
+      return;
+    }
+
+    const sheets = google.sheets('v4');
+    const OAuth2 = google.auth.OAuth2;
+    const oauth2Client = new OAuth2(
+      "858762091889-9lpun3on1g2qi0qok697r21mseo55cje.apps.googleusercontent.com",
+      "6JoxBGFYO3WHKgRZgIOxk2tE",
+      "http://localhost:3000"
+    );
+
+    oauth2Client.getToken(code, function (err, tokens) {
+      // Now tokens contains an access_token and an optional refresh_token. Save them.
+      if (err) {
+        return;
+      }
+
+      oauth2Client.setCredentials(tokens);
+
+      let project = projects.filter( (project) => {
+        return project.boardId === boardId;
+      });
+
+      if(!project[0]){
+        console.log('noproject');
+        return;
+      }
+
+      if(!project[0].sheetId){
+        console.log('nosheet');
+        return;
+      }
+
+      sheets.spreadsheets.get({
+        spreadsheetId: project[0].sheetId,
+        auth: oauth2Client
+      }, function (err, document) {
+        console.log(err);
+        console.log('request 1 success');
+        // Retrieve data about current Sheet
+        const documentSheets = document.sheets;
+        const nowdate = moment().format('MM-DD-YYYY');
+        let exist = false;
+
+        let lastIndex = 0;
+        let lastId;
+
+        let evoId;
+        let evoColumnIndex;
+
+        documentSheets.forEach( (sheet) => {
+          let title = sheet.properties.title;
+          if(title.includes('As of ')){
+            lastIndex = documentSheets.indexOf(sheet); //Where create column
+            lastId = sheet.properties.sheetId;
+          }
+
+          if(title.includes(nowdate)){
+            exist = true;
+          }
+
+          if(title.includes('Evolution')){
+            evoId = sheet.properties.sheetId;
+          }
+        });
+
+        // Sheet already exist today, stop here
+        if(exist){
+          // EXIT
+          return;
+        }
+
+        sheets.spreadsheets.values.batchGetByDataFilter({
+          spreadsheetId: project[0].sheetId,
+          auth: oauth2Client,
+          resource: {
+            "dataFilters": [
+              {
+                "gridRange": {
+                  "sheetId": evoId,
+                  "startColumnIndex": 0,
+                  "startRowIndex": 0,
+                  "endRowIndex": 1
+                }
+              }
+            ]
+          }
+        }, function (err, res) {
+          console.log(err);
+          console.log('request 2 success');
+
+          evoColumnIndex = res.valueRanges[0].valueRange.values[0].length;
+          sheets.spreadsheets.batchUpdate({
+            spreadsheetId: project[0].sheetId,
+            auth: oauth2Client,
+            resource: {
+              "requests": [
+                {
+                  "duplicateSheet": {
+                    "insertSheetIndex": lastIndex + 1,
+                    "newSheetName": "As of " + nowdate,
+                    "sourceSheetId": lastId
+                  }
+                },
+                {
+                  "insertDimension": {
+                    "range": {
+                      "sheetId": evoId,
+                      "dimension": "COLUMNS",
+                      "startIndex": evoColumnIndex,
+                      "endIndex": evoColumnIndex + 1
+                    },
+                    "inheritFromBefore": true
+                  }
+                },
+                {
+                  "copyPaste":
+                  {
+                    "source": {
+                      "sheetId": evoId,
+                      "startRowIndex": 2,
+                      "startColumnIndex": evoColumnIndex - 1,
+                      "endRowIndex": 21,
+                    },
+                    "destination": {
+                      "sheetId": evoId,
+                      "startRowIndex": 2,
+                      "startColumnIndex": evoColumnIndex,
+                      "endRowIndex": 21,
+                    },
+                  }
+                }
+              ]
+            },
+          }, function(err, success){
+            console.log(err);
+            console.log('request 3 success');
+
+            const newSheetId = success.replies[0].duplicateSheet.properties.sheetId;
+
+            sheets.spreadsheets.values.batchClearByDataFilter({
+              spreadsheetId: project[0].sheetId,
+              auth: oauth2Client,
+              resource: {
+                "dataFilters": [
+                  {
+                    "gridRange": {
+                      "sheetId": newSheetId,
+                      "startColumnIndex": 11,
+                      "startRowIndex": 3,
+                      "endColumnIndex": 14
+                    }
+                  }
+                ]
+              }
+            }, function(err, success) {
+              console.log(err);
+              console.log('request 4 success');
+
+              let csvLines = csv.split('\n');
+
+              let data = [];
+              for (var i=1; i<csvLines.length; i++)
+              {
+                  const fields = csvLines[i].replace(/"/g,'').split(',');
+
+                  const listName = fields[1];
+                  const cardName = fields[3];
+                  const labels = fields[4];
+
+                  data.push([listName, cardName, labels]);
+              }
+
+              sheets.spreadsheets.values.batchUpdateByDataFilter({
+                spreadsheetId: project[0].sheetId,
+                auth: oauth2Client,
+                resource: {
+                  "data": [
+                    {
+                      "majorDimension": "ROWS",
+                      "dataFilter": {
+                        "gridRange": {
+                          "sheetId": evoId,
+                          "startColumnIndex": evoColumnIndex,
+                          "startRowIndex": 0
+                        }
+                      },
+                      "values": [
+                        [
+                          "As of"
+                        ],
+                        [
+                          nowdate
+                        ]
+                      ]
+                    },
+                    {
+                      "majorDimension": "ROWS",
+                      "dataFilter": {
+                        "gridRange": {
+                          "sheetId": newSheetId,
+                          "startColumnIndex": 11,
+                          "startRowIndex": 3
+                        }
+                      },
+                      "values": data
+                    }
+                  ],
+                  "valueInputOption": "RAW"
+                }
+              }, function(err, success){
+                console.log(err);
+                console.log('request 5 success');
+              })
+            })
+          })
+        })
+      });
+    });
+  },
+  googleAuth(){
+
+    const OAuth2 = google.auth.OAuth2;
+    const oauth2Client = new OAuth2(
+      "858762091889-9lpun3on1g2qi0qok697r21mseo55cje.apps.googleusercontent.com",
+      "6JoxBGFYO3WHKgRZgIOxk2tE",
+      "http://localhost:3000"
+    );
+
+    // Retrict request to acklenavenue domain
+    // google.options({
+    //   // auth: oauth2Client,
+    //   hosted_domain: 'amazylia.com'
+    // });
+
+    const url = oauth2Client.generateAuthUrl({
+      access_type: 'offline',
+      scope: 'https://www.googleapis.com/auth/drive',
+    });
+
+    return url
   }
 });
