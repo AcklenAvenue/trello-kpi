@@ -49,27 +49,46 @@ Meteor.methods({
     const csv = json2csv({ data, fields });
     return csv;
   },
-  getCurrentSpreadSheet(boardId, code, csv){
+  getCurrentSpreadSheet(boardId, csv, code = 0){
 
     if(!csv){
       return;
     }
 
     const sheets = google.sheets('v4');
-    const OAuth2 = google.auth.OAuth2;
-    const oauth2Client = new OAuth2(
-      "858762091889-9lpun3on1g2qi0qok697r21mseo55cje.apps.googleusercontent.com",
-      "6JoxBGFYO3WHKgRZgIOxk2tE",
-      "http://localhost:3000"
+
+    var key = require('../../google.json');
+    var jwtClient = new google.auth.JWT(
+      key.client_email,
+      null,
+      key.private_key,
+      ['https://www.googleapis.com/auth/drive'], // an array of auth scopes
+      null
     );
 
-    oauth2Client.getToken(code, function (err, tokens) {
-      // Now tokens contains an access_token and an optional refresh_token. Save them.
+    jwtClient.authorize(function (err, tokens) {
       if (err) {
+        console.log('myyyyy');
+        console.log(err);
         return;
       }
 
-      oauth2Client.setCredentials(tokens);
+    // const OAuth2 = google.auth.OAuth2;
+    // const oauth2Client = new OAuth2(
+    //   "858762091889-9lpun3on1g2qi0qok697r21mseo55cje.apps.googleusercontent.com",
+    //   "6JoxBGFYO3WHKgRZgIOxk2tE",
+    //   "http://localhost:3000"
+    // );
+
+    // oauth2Client.getToken(code, function (err, tokens) {
+    //   // Now tokens contains an access_token and an optional refresh_token. Save them.
+    //   if (err) {
+    //     return;
+    //   }
+
+    //   oauth2Client.setCredentials(tokens);
+
+      const auth = jwtClient;
 
       let project = projects.filter( (project) => {
         return project.boardId === boardId;
@@ -87,7 +106,7 @@ Meteor.methods({
 
       sheets.spreadsheets.get({
         spreadsheetId: project[0].sheetId,
-        auth: oauth2Client
+        auth
       }, function (err, document) {
         console.log(err);
         console.log('request 1 success');
@@ -118,6 +137,8 @@ Meteor.methods({
           }
         });
 
+        // console.log('Yesss');
+        // return;
         // Sheet already exist today, stop here
         if(exist){
           // EXIT
@@ -126,7 +147,7 @@ Meteor.methods({
 
         sheets.spreadsheets.values.batchGetByDataFilter({
           spreadsheetId: project[0].sheetId,
-          auth: oauth2Client,
+          auth,
           resource: {
             "dataFilters": [
               {
@@ -146,7 +167,7 @@ Meteor.methods({
           evoColumnIndex = res.valueRanges[0].valueRange.values[0].length;
           sheets.spreadsheets.batchUpdate({
             spreadsheetId: project[0].sheetId,
-            auth: oauth2Client,
+            auth,
             resource: {
               "requests": [
                 {
@@ -194,7 +215,7 @@ Meteor.methods({
 
             sheets.spreadsheets.values.batchClearByDataFilter({
               spreadsheetId: project[0].sheetId,
-              auth: oauth2Client,
+              auth,
               resource: {
                 "dataFilters": [
                   {
@@ -227,7 +248,7 @@ Meteor.methods({
 
               sheets.spreadsheets.values.batchUpdateByDataFilter({
                 spreadsheetId: project[0].sheetId,
-                auth: oauth2Client,
+                auth,
                 resource: {
                   "data": [
                     {
@@ -281,17 +302,31 @@ Meteor.methods({
       "http://localhost:3000"
     );
 
-    // Retrict request to acklenavenue domain
-    // google.options({
-    //   // auth: oauth2Client,
-    //   hosted_domain: 'amazylia.com'
-    // });
-
     const url = oauth2Client.generateAuthUrl({
       access_type: 'offline',
       scope: 'https://www.googleapis.com/auth/drive',
     });
 
     return url
+  },
+  updateProjects(){
+
+
+    projects.forEach( (project)=> {
+      console.log(project.id);
+
+      let credentials = {
+        key: 'eb85f204ca42a90975a69f5748838541',
+        token: 'cccd1effd8d76e6b13b5d3ff3c4f38db9e36f97c156c079e93a59ba230ab0dc3',
+        boardId: project.boardId
+      };
+
+      Meteor.call('getCards', credentials.key, credentials.token, credentials.boardId, (err, csv) => {
+        Meteor.call('getBoardNameCurrent', credentials.key, credentials.token, credentials.boardId, (err, boardName) => {
+          Meteor.call('getCurrentSpreadSheet', credentials.boardId, parsed.code, csv);
+        });
+      });
+    });
+
   }
 });

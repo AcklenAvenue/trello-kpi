@@ -18,7 +18,7 @@ export default class TrelloRequestCurrent extends React.Component {
 
       Meteor.call('getCards', credentials.key, credentials.token, credentials.boardId, (err, csv) => {
         Meteor.call('getBoardNameCurrent', credentials.key, credentials.token, credentials.boardId, (err, boardName) => {
-          Meteor.call('getCurrentSpreadSheet', credentials.boardId, parsed.code, csv);
+          Meteor.call('getCurrentSpreadSheet', credentials.boardId, csv, parsed.code);
           // let file = new File([csv], `${boardName}.csv`, {type: "text/plain;charset=utf-8"});
           // FileSaver.saveAs(file);
         });
@@ -29,13 +29,13 @@ export default class TrelloRequestCurrent extends React.Component {
   onSubmit(e) {
     const cookies = new Cookies();
 
-    const key = this.refs.key.value.trim();
-    const token = this.refs.token.value.trim();
-    const boardId = this.refs.boardId.value.trim();
+    // const key = this.refs.key.value.trim();
+    // const token = this.refs.token.value.trim();
+    // const boardId = this.refs.boardId.value.trim();
 
-    // const key = 'eb85f204ca42a90975a69f5748838541';
-    // const token = 'cccd1effd8d76e6b13b5d3ff3c4f38db9e36f97c156c079e93a59ba230ab0dc3';
-    // const boardId = 'eMdGL0EA';
+    const key = 'eb85f204ca42a90975a69f5748838541';
+    const token = 'cccd1effd8d76e6b13b5d3ff3c4f38db9e36f97c156c079e93a59ba230ab0dc3';
+    const boardId = 'eMdGL0EA';
 
     e.preventDefault();
 
