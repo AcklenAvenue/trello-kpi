@@ -5,6 +5,7 @@ import { Trello } from './trello';
 
 const moment = require('moment');
 const google = require('googleapis');
+const key = require('../../google.json');
 
 Meteor.methods({
   async getBoardNameCurrent(key, token, boardId) {
@@ -49,248 +50,248 @@ Meteor.methods({
     const csv = json2csv({ data, fields });
     return csv;
   },
-  getCurrentSpreadSheet(boardId, csv, code = 0){
+  async getCurrentSpreadSheet(boardId, csv, code = 0){
 
     if(!csv){
       return;
     }
 
     const sheets = google.sheets('v4');
+    let auth;
 
-    var key = require('../../google.json');
-    var jwtClient = new google.auth.JWT(
-      key.client_email,
-      null,
-      key.private_key,
-      ['https://www.googleapis.com/auth/drive'], // an array of auth scopes
-      null
-    );
+    if(code){
+      const OAuth2 = google.auth.OAuth2;
+      const oauth2Client = new OAuth2(
+        "858762091889-9lpun3on1g2qi0qok697r21mseo55cje.apps.googleusercontent.com",
+        "6JoxBGFYO3WHKgRZgIOxk2tE",
+        "http://localhost:3000"
+      );
 
-    jwtClient.authorize(function (err, tokens) {
-      if (err) {
-        console.log('myyyyy');
-        console.log(err);
-        return;
-      }
-
-    // const OAuth2 = google.auth.OAuth2;
-    // const oauth2Client = new OAuth2(
-    //   "858762091889-9lpun3on1g2qi0qok697r21mseo55cje.apps.googleusercontent.com",
-    //   "6JoxBGFYO3WHKgRZgIOxk2tE",
-    //   "http://localhost:3000"
-    // );
-
-    // oauth2Client.getToken(code, function (err, tokens) {
-    //   // Now tokens contains an access_token and an optional refresh_token. Save them.
-    //   if (err) {
-    //     return;
-    //   }
-
-    //   oauth2Client.setCredentials(tokens);
-
-      const auth = jwtClient;
-
-      let project = projects.filter( (project) => {
-        return project.boardId === boardId;
-      });
-
-      if(!project[0]){
-        console.log('noproject');
-        return;
-      }
-
-      if(!project[0].sheetId){
-        console.log('nosheet');
-        return;
-      }
-
-      sheets.spreadsheets.get({
-        spreadsheetId: project[0].sheetId,
-        auth
-      }, function (err, document) {
-        console.log(err);
-        console.log('request 1 success');
-        // Retrieve data about current Sheet
-        const documentSheets = document.sheets;
-        const nowdate = moment().format('MM-DD-YYYY');
-        let exist = false;
-
-        let lastIndex = 0;
-        let lastId;
-
-        let evoId;
-        let evoColumnIndex;
-
-        documentSheets.forEach( (sheet) => {
-          let title = sheet.properties.title;
-          if(title.includes('As of ')){
-            lastIndex = documentSheets.indexOf(sheet); //Where create column
-            lastId = sheet.properties.sheetId;
+      const tokens = await new Promise(resolve => {
+        oauth2Client.getToken(code, function (err, tokens) {
+          if (err) {
+            return;
           }
-
-          if(title.includes(nowdate)){
-            exist = true;
-          }
-
-          if(title.includes('Evolution')){
-            evoId = sheet.properties.sheetId;
-          }
+          resolve(tokens);
         });
+      })
+      oauth2Client.setCredentials(tokens);
+      auth = oauth2Client;
+    }else{
+      const jwtClient = new google.auth.JWT(
+        key.client_email,
+        null,
+        key.private_key,
+        ['https://www.googleapis.com/auth/drive'], // an array of auth scopes
+        null
+      );
 
-        // console.log('Yesss');
-        // return;
-        // Sheet already exist today, stop here
-        if(exist){
-          // EXIT
+      jwtClient.authorize(function (err, tokens) {
+        if (err) {
+          console.log(err);
           return;
         }
+      });
+      auth = jwtClient;
+    }
 
-        sheets.spreadsheets.values.batchGetByDataFilter({
+    let project = projects.filter( (project) => {
+      return project.boardId === boardId;
+    });
+
+    if(!project[0]){
+      console.log('noproject');
+      return;
+    }
+
+    if(!project[0].sheetId){
+      console.log('nosheet');
+      return;
+    }
+
+    sheets.spreadsheets.get({
+      spreadsheetId: project[0].sheetId,
+      auth
+    }, function (err, document) {
+      console.log(err);
+      console.log('request 1 success');
+      // Retrieve data about current Sheet
+      const documentSheets = document.sheets;
+      const nowdate = moment().format('MM-DD-YYYY');
+      let exist = false;
+
+      let lastIndex = 0;
+      let lastId;
+
+      let evoId;
+      let evoColumnIndex;
+
+      documentSheets.forEach( (sheet) => {
+        let title = sheet.properties.title;
+        if(title.includes('As of ')){
+          lastIndex = documentSheets.indexOf(sheet); //Where create column
+          lastId = sheet.properties.sheetId;
+        }
+
+        if(title.includes(nowdate)){
+          exist = true;
+        }
+
+        if(title.includes('Evolution')){
+          evoId = sheet.properties.sheetId;
+        }
+      });
+
+      if(exist){
+        // EXIT
+        return;
+      }
+
+      sheets.spreadsheets.values.batchGetByDataFilter({
+        spreadsheetId: project[0].sheetId,
+        auth,
+        resource: {
+          "dataFilters": [
+            {
+              "gridRange": {
+                "sheetId": evoId,
+                "startColumnIndex": 0,
+                "startRowIndex": 0,
+                "endRowIndex": 1
+              }
+            }
+          ]
+        }
+      }, function (err, res) {
+        console.log(err);
+        console.log('request 2 success');
+
+        evoColumnIndex = res.valueRanges[0].valueRange.values[0].length;
+        sheets.spreadsheets.batchUpdate({
           spreadsheetId: project[0].sheetId,
           auth,
           resource: {
-            "dataFilters": [
+            "requests": [
               {
-                "gridRange": {
-                  "sheetId": evoId,
-                  "startColumnIndex": 0,
-                  "startRowIndex": 0,
-                  "endRowIndex": 1
+                "duplicateSheet": {
+                  "insertSheetIndex": lastIndex + 1,
+                  "newSheetName": "As of " + nowdate,
+                  "sourceSheetId": lastId
+                }
+              },
+              {
+                "insertDimension": {
+                  "range": {
+                    "sheetId": evoId,
+                    "dimension": "COLUMNS",
+                    "startIndex": evoColumnIndex,
+                    "endIndex": evoColumnIndex + 1
+                  },
+                  "inheritFromBefore": true
+                }
+              },
+              {
+                "copyPaste":
+                {
+                  "source": {
+                    "sheetId": evoId,
+                    "startRowIndex": 2,
+                    "startColumnIndex": evoColumnIndex - 1,
+                    "endRowIndex": 21,
+                  },
+                  "destination": {
+                    "sheetId": evoId,
+                    "startRowIndex": 2,
+                    "startColumnIndex": evoColumnIndex,
+                    "endRowIndex": 21,
+                  },
                 }
               }
             ]
-          }
-        }, function (err, res) {
+          },
+        }, function(err, success){
           console.log(err);
-          console.log('request 2 success');
+          console.log('request 3 success');
 
-          evoColumnIndex = res.valueRanges[0].valueRange.values[0].length;
-          sheets.spreadsheets.batchUpdate({
+          const newSheetId = success.replies[0].duplicateSheet.properties.sheetId;
+
+          sheets.spreadsheets.values.batchClearByDataFilter({
             spreadsheetId: project[0].sheetId,
             auth,
             resource: {
-              "requests": [
+              "dataFilters": [
                 {
-                  "duplicateSheet": {
-                    "insertSheetIndex": lastIndex + 1,
-                    "newSheetName": "As of " + nowdate,
-                    "sourceSheetId": lastId
-                  }
-                },
-                {
-                  "insertDimension": {
-                    "range": {
-                      "sheetId": evoId,
-                      "dimension": "COLUMNS",
-                      "startIndex": evoColumnIndex,
-                      "endIndex": evoColumnIndex + 1
-                    },
-                    "inheritFromBefore": true
-                  }
-                },
-                {
-                  "copyPaste":
-                  {
-                    "source": {
-                      "sheetId": evoId,
-                      "startRowIndex": 2,
-                      "startColumnIndex": evoColumnIndex - 1,
-                      "endRowIndex": 21,
-                    },
-                    "destination": {
-                      "sheetId": evoId,
-                      "startRowIndex": 2,
-                      "startColumnIndex": evoColumnIndex,
-                      "endRowIndex": 21,
-                    },
+                  "gridRange": {
+                    "sheetId": newSheetId,
+                    "startColumnIndex": 11,
+                    "startRowIndex": 3,
+                    "endColumnIndex": 14
                   }
                 }
               ]
-            },
-          }, function(err, success){
+            }
+          }, function(err, success) {
             console.log(err);
-            console.log('request 3 success');
+            console.log('request 4 success');
 
-            const newSheetId = success.replies[0].duplicateSheet.properties.sheetId;
+            let csvLines = csv.split('\n');
 
-            sheets.spreadsheets.values.batchClearByDataFilter({
+            let data = [];
+            for (var i=1; i<csvLines.length; i++)
+            {
+                const fields = csvLines[i].replace(/"/g,'').split(',');
+
+                const listName = fields[1];
+                const cardName = fields[3];
+                const labels = fields[4];
+
+                data.push([listName, cardName, labels]);
+            }
+
+            sheets.spreadsheets.values.batchUpdateByDataFilter({
               spreadsheetId: project[0].sheetId,
               auth,
               resource: {
-                "dataFilters": [
+                "data": [
                   {
-                    "gridRange": {
-                      "sheetId": newSheetId,
-                      "startColumnIndex": 11,
-                      "startRowIndex": 3,
-                      "endColumnIndex": 14
-                    }
-                  }
-                ]
-              }
-            }, function(err, success) {
-              console.log(err);
-              console.log('request 4 success');
-
-              let csvLines = csv.split('\n');
-
-              let data = [];
-              for (var i=1; i<csvLines.length; i++)
-              {
-                  const fields = csvLines[i].replace(/"/g,'').split(',');
-
-                  const listName = fields[1];
-                  const cardName = fields[3];
-                  const labels = fields[4];
-
-                  data.push([listName, cardName, labels]);
-              }
-
-              sheets.spreadsheets.values.batchUpdateByDataFilter({
-                spreadsheetId: project[0].sheetId,
-                auth,
-                resource: {
-                  "data": [
-                    {
-                      "majorDimension": "ROWS",
-                      "dataFilter": {
-                        "gridRange": {
-                          "sheetId": evoId,
-                          "startColumnIndex": evoColumnIndex,
-                          "startRowIndex": 0
-                        }
-                      },
-                      "values": [
-                        [
-                          "As of"
-                        ],
-                        [
-                          nowdate
-                        ]
-                      ]
+                    "majorDimension": "ROWS",
+                    "dataFilter": {
+                      "gridRange": {
+                        "sheetId": evoId,
+                        "startColumnIndex": evoColumnIndex,
+                        "startRowIndex": 0
+                      }
                     },
-                    {
-                      "majorDimension": "ROWS",
-                      "dataFilter": {
-                        "gridRange": {
-                          "sheetId": newSheetId,
-                          "startColumnIndex": 11,
-                          "startRowIndex": 3
-                        }
-                      },
-                      "values": data
-                    }
-                  ],
-                  "valueInputOption": "RAW"
-                }
-              }, function(err, success){
-                console.log(err);
-                console.log('request 5 success');
-              })
+                    "values": [
+                      [
+                        "As of"
+                      ],
+                      [
+                        nowdate
+                      ]
+                    ]
+                  },
+                  {
+                    "majorDimension": "ROWS",
+                    "dataFilter": {
+                      "gridRange": {
+                        "sheetId": newSheetId,
+                        "startColumnIndex": 11,
+                        "startRowIndex": 3
+                      }
+                    },
+                    "values": data
+                  }
+                ],
+                "valueInputOption": "RAW"
+              }
+            }, function(err, success){
+              console.log(err);
+              console.log('request 5 success');
             })
           })
         })
-      });
+      })
     });
   },
   googleAuth(){
@@ -311,7 +312,6 @@ Meteor.methods({
   },
   updateProjects(){
 
-
     projects.forEach( (project)=> {
       console.log(project.id);
 
@@ -323,10 +323,9 @@ Meteor.methods({
 
       Meteor.call('getCards', credentials.key, credentials.token, credentials.boardId, (err, csv) => {
         Meteor.call('getBoardNameCurrent', credentials.key, credentials.token, credentials.boardId, (err, boardName) => {
-          Meteor.call('getCurrentSpreadSheet', credentials.boardId, parsed.code, csv);
+          Meteor.call('getCurrentSpreadSheet', credentials.boardId, csv);
         });
       });
     });
-
   }
 });

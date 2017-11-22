@@ -1,18 +1,10 @@
 [
     {
-        "id": "1",
-        "name": "Compass 3.0",
-        "trelloKey" : "fake444444444",
-        "trelloToken" : "fake12312312",
-        "boardId": "eMdGL0EA",
-        "sheetId": "19_dMBlRwLpTFu1qvm-w7B_K4TfVI0ipIoPLYINuCJtA"
-    },
-    {
-        "id": "2",
-        "name": "Roadrunner",
-        "trelloKey" : "fake444444444",
-        "trelloToken" : "fake12312312",
-        "boardId": "eMdGL0EA",
-        "sheetId": "1U0qtEFa-mhp3IqlunfxG6C3mk2tnXoKHwMJdulNXmqQ"
+    "id": "1",
+    "name": "AquaGem",
+    "trelloKey" : "241111d232852a370753af5c5337e529",
+    "trelloToken" : "09337dd09e2ad1b056874ba6c9e7ca0cdc11670e68c127f7fd1afda60acd8a3b",
+    "boardId": "eMdGL0EA",
+    "sheetId": "19_dMBlRwLpTFu1qvm-w7B_K4TfVI0ipIoPLYINuCJtA"
     }
-]
+    ]
