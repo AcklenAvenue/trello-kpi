@@ -2,9 +2,19 @@
     {
     "id": "1",
     "name": "AquaGem",
-    "trelloKey" : "241111d232852a370753af5c5337e529",
-    "trelloToken" : "09337dd09e2ad1b056874ba6c9e7ca0cdc11670e68c127f7fd1afda60acd8a3b",
-    "boardId": "eMdGL0EA",
-    "sheetId": "19_dMBlRwLpTFu1qvm-w7B_K4TfVI0ipIoPLYINuCJtA"
+    "boardId": "596662821f42832fb56a17e1",
+    "sheetId": "1PVoqP8AAzpaDGYuL_ntsFeB4FNNSsFnOScCVck3uEcE"
+    },
+    {
+    "id": "2",
+    "name": "HammerTime",
+    "boardId": "594d9bb7afc538f525cc4f6c",
+    "sheetId": "1hY4D8ozLAFRGID64jrDke-szIhW18txZiXh3-6Utsf8"
+    },
+    {
+    "id": "3",
+    "name": "LifeLight",
+    "boardId": "59860758940079dd1aab9fb5",
+    "sheetId": "1EmI7XH-jyqKB8vbojpjU23qXFu1e1j15S5AJcg4V6ew"
     }
-    ]
+]

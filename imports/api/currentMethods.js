@@ -121,6 +121,7 @@ Meteor.methods({
       let exist = false;
 
       let lastIndex = 0;
+      let templateId;
       let lastId;
 
       let evoId;
@@ -131,6 +132,10 @@ Meteor.methods({
         if(title.includes('As of ')){
           lastIndex = documentSheets.indexOf(sheet); //Where create column
           lastId = sheet.properties.sheetId;
+        }
+
+        if(title.includes('Template')){
+          templateId = sheet.properties.sheetId;
         }
 
         if(title.includes(nowdate)){
@@ -176,7 +181,7 @@ Meteor.methods({
                 "duplicateSheet": {
                   "insertSheetIndex": lastIndex + 1,
                   "newSheetName": "As of " + nowdate,
-                  "sourceSheetId": lastId
+                  "sourceSheetId": lastId ? lastId : templateId
                 }
               },
               {
@@ -316,8 +321,8 @@ Meteor.methods({
       console.log(project.id);
 
       let credentials = {
-        key: 'eb85f204ca42a90975a69f5748838541',
-        token: 'cccd1effd8d76e6b13b5d3ff3c4f38db9e36f97c156c079e93a59ba230ab0dc3',
+        key: 'ac95fa0d46829f2504dce21cc8d1cf13',
+        token: '09337dd09e2ad1b056874ba6c9e7ca0cdc11670e68c127f7fd1afda60acd8a3b',
         boardId: project.boardId
       };
 
