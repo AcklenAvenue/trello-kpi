@@ -64,7 +64,7 @@ Meteor.methods({
       const oauth2Client = new OAuth2(
         "858762091889-9lpun3on1g2qi0qok697r21mseo55cje.apps.googleusercontent.com",
         "6JoxBGFYO3WHKgRZgIOxk2tE",
-        "http://localhost:3000"
+        process.env.ROOT_URL || "http://localhost:3000"
       );
 
       const tokens = await new Promise(resolve => {
@@ -305,7 +305,7 @@ Meteor.methods({
     const oauth2Client = new OAuth2(
       "858762091889-9lpun3on1g2qi0qok697r21mseo55cje.apps.googleusercontent.com",
       "6JoxBGFYO3WHKgRZgIOxk2tE",
-      "http://localhost:3000"
+      process.env.ROOT_URL || "http://localhost:3000"
     );
 
     const url = oauth2Client.generateAuthUrl({
