@@ -3,18 +3,65 @@
     "id": "1",
     "name": "AquaGem",
     "boardId": "596662821f42832fb56a17e1",
-    "sheetId": "1PVoqP8AAzpaDGYuL_ntsFeB4FNNSsFnOScCVck3uEcE"
+    "sheetId": "1PVoqP8AAzpaDGYuL_ntsFeB4FNNSsFnOScCVck3uEcE",
+    "lists": [
+        "Product Backlog",
+        "Release Backlog - Admin",
+        "Release Backlog - Stories",
+        "Up Next WIP (6)",
+        "Developing WIP (4) -->",
+        "Ready for Code Review",
+        "Ready to Test (Dev)",
+        "Ready for Internal Showcase",
+        "Ready for Client Test",
+        "Client Test (staging) (WIP 4)",
+        "Ready to Deploy (Production)",
+        "Deployed to Production"
+    ]
     },
     {
     "id": "2",
     "name": "HammerTime",
     "boardId": "594d9bb7afc538f525cc4f6c",
-    "sheetId": "1hY4D8ozLAFRGID64jrDke-szIhW18txZiXh3-6Utsf8"
+    "sheetId": "1hY4D8ozLAFRGID64jrDke-szIhW18txZiXh3-6Utsf8",
+    "lists": [
+        "Product Backlog (Stories)",
+        "Release Backlog (Stories)",
+        "On Deck (WIP 4)",
+        "Dev [WIP 4--->]",
+        "Ready for code review",
+        "Code Reviewing",
+        "Ready to test (Dev)",
+        "Testing (Dev)",
+        "Ready to deploy (Staging)",
+        "Deployed (staging)",
+        "Testing (Staging) [<--WIP 4]",
+        "Client Test (Staging) [WIP 4]",
+        "Client's ready to Deploy (Prod)",
+        "Recently Done/Released"
+    ]
     },
     {
     "id": "3",
     "name": "LifeLight",
     "boardId": "59860758940079dd1aab9fb5",
-    "sheetId": "1EmI7XH-jyqKB8vbojpjU23qXFu1e1j15S5AJcg4V6ew"
+    "sheetId": "1EmI7XH-jyqKB8vbojpjU23qXFu1e1j15S5AJcg4V6ew",
+    "lists": [
+        "Release Backlog",
+        "A Desarrollar [WIP 4]",
+        "En Desarrollo [WIP 4] -->",
+        "Listo para Revisión de Código",
+        "Listo para Revisión de Código",
+        "Listo para Pruebas (Dev)",
+        "En Pruebas (Dev)",
+        "Listo para ser Implementado (Staging)",
+        "Implementado (Staging)",
+        "En Pruebas (Staging) <-- [WIP 4]",
+        "En Pruebas (Staging) <-- [WIP 4]",
+        "Client Demo",
+        "Client Test (Staging) [WIP 4]",
+        "Listo para ser Implementado (Production)",
+        "Implementado (Production)"
+    ]
     }
 ]

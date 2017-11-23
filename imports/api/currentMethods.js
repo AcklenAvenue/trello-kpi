@@ -250,6 +250,10 @@ Meteor.methods({
                 const cardName = fields[3];
                 const labels = fields[4];
 
+                if(!project[0].lists.includes(listName.trim())){
+                  continue;
+                }
+
                 data.push([listName, cardName, labels]);
             }
 
