@@ -115,7 +115,7 @@ Meteor.methods({
     }, function (err, document) {
       console.log(err);
       console.log('request 1 success');
-      // Retrieve data about current Sheet
+
       const documentSheets = document.sheets;
       const nowdate = moment().format('MM-DD-YYYY');
       let exist = false;
