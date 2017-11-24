@@ -7,6 +7,8 @@ const moment = require('moment');
 const google = require('googleapis');
 const key = require('../../google.json');
 
+const util = require('util')
+
 Meteor.methods({
   async getBoardNameCurrent(key, token, boardId) {
     const response = await Trello.getBoardName(key, token, boardId);
@@ -220,7 +222,33 @@ Meteor.methods({
 
           const newSheetId = success.replies[0].duplicateSheet.properties.sheetId;
 
-          sheets.spreadsheets.values.batchClearByDataFilter({
+          sheets.spreadsheets.values.batchGetByDataFilter({
+            spreadsheetId: project[0].sheetId,
+            auth,
+            resource: {
+              "dataFilters": [
+                {
+                  "gridRange": {
+                    "sheetId": newSheetId,
+                    "startColumnIndex": 0,
+                    "startRowIndex": 26,
+                    "endColumnIndex": 1
+                  }
+                }
+              ]
+            }
+          }, function (err, res) {
+            console.log(err);
+            console.log('request 4 success');
+
+            // if there are filters in the spreadsheet, use those instead of the ones in the JSON file
+            const colFilters = res.valueRanges[0].valueRange.values.map(elem => elem[0]);
+
+            if (colFilters.length > 0) {
+              project[0].lists = colFilters;
+            }
+
+            sheets.spreadsheets.values.batchClearByDataFilter({
             spreadsheetId: project[0].sheetId,
             auth,
             resource: {
@@ -237,7 +265,7 @@ Meteor.methods({
             }
           }, function(err, success) {
             console.log(err);
-            console.log('request 4 success');
+            console.log('request 5 success');
 
             let csvLines = csv.split('\n');
 
@@ -296,9 +324,10 @@ Meteor.methods({
               }
             }, function(err, success){
               console.log(err);
-              console.log('request 5 success');
+              console.log('request 6 success');
             })
           })
+          });                  
         })
       })
     });
