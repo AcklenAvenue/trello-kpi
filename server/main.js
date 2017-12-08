@@ -7,8 +7,7 @@ Meteor.startup(() => {
   SyncedCron.add({
     name: 'Interate every project to update google SpreadSheet',
     schedule: function(parser) {
-      // 'at 5:00 pm on Mon'
-      return parser.text('every 5 mins');
+      return parser.text('at 7:00 am on Mon');
     },
     job: function() {
       console.log('I am the cronjob!!')
