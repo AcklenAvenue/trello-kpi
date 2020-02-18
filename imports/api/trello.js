@@ -17,5 +17,8 @@ export const Trello = {
   },
   getActionsInCard(key, token, cardId) {
     return axios.get(`${baseUrl}cards/${cardId}/actions?key=${key}&token=${token}&filter=updateCard:idList`);
+  },
+  generateReleasePlan(boardName) {
+    return axios.get(`http://localhost:8000/activities/${boardName}`);
   }
 };
