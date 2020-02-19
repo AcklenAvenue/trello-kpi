@@ -13,13 +13,19 @@ export default class TrelloReleasePlan extends React.Component {
             if(err){
                 throw err;
             }
-            console.log('Res:', res)
+            const buffer = new Uint8Array(Object.values(res));
+            const blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
+            const url = window.URL.createObjectURL(blob);
+            this.setState({
+              downloadUrl: url
+            })
         });
     }
   };
 
   state = {
-    boardName: ''
+    boardName: '',
+    downloadUrl: ''
   }
   
   
@@ -44,6 +50,10 @@ export default class TrelloReleasePlan extends React.Component {
             <div className="text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12">
                 <button className="btn btn-success btn-lg btn-block">Generate Release Plan</button>
             </div>
+            {this.state.downloadUrl !== '' && 
+              <div className="text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12">
+                  <a className="btn btn-success btn-lg btn-block" href={this.state.downloadUrl}>Download Release Plan</a>
+              </div>}
         </form>
       </div>
     );
