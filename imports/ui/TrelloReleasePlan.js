@@ -47,11 +47,13 @@ export default class TrelloReleasePlan extends React.Component {
             </div>
             <br></br>
             <br></br>
-            <div className="text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12">
+            <div className={`text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12 ${this.state.boardName.length > 0 ? 'active' : 'disabled'}`} id="generate-rp">
                 <button className="btn btn-success btn-lg btn-block">Generate Release Plan</button>
             </div>
+            <br></br>
+            <br></br>
             {this.state.downloadUrl !== '' && 
-              <div className="text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12">
+              <div className="text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12" id="download-rp">
                   <a className="btn btn-success btn-lg btn-block" href={this.state.downloadUrl}>Download Release Plan</a>
               </div>}
         </form>
