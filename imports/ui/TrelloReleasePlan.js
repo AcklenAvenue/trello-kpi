@@ -54,7 +54,7 @@ export default class TrelloReleasePlan extends React.Component {
             <br></br>
             {this.state.downloadUrl !== '' && 
               <div className="text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12" id="download-rp">
-                  <a className="btn btn-success btn-lg btn-block" href={this.state.downloadUrl}>Download Release Plan</a>
+                  <a className="btn btn-success btn-lg btn-block" href={this.state.downloadUrl} download={this.state.boardName}>Download Release Plan</a>
               </div>}
         </form>
       </div>
