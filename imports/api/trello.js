@@ -19,6 +19,6 @@ export const Trello = {
     return axios.get(`${baseUrl}cards/${cardId}/actions?key=${key}&token=${token}&filter=updateCard:idList`);
   },
   generateReleasePlan(boardName) {
-    return axios.get(`http://localhost:8000/activities/${boardName}`);
+    return axios.get(`${process.env.RELEASE_PLAN_URL}/${boardName}`);
   }
 };
