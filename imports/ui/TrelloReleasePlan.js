@@ -6,9 +6,7 @@ import boards from '../../boards';
 export default class TrelloReleasePlan extends React.Component {
   onSubmit(e) {
     e.preventDefault();
-    if(!this.state.boardName){
-        console.log('Nope')
-    }else{
+    if(this.state.boardName){
         Meteor.call('generateReleasePlan', this.state.boardName, (err, res) => {
             if(err){
                 throw err;
