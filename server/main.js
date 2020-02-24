@@ -7,9 +7,11 @@ import '../imports/api/historyMethods';
 import '../imports/api/boardsMethods';
 import '../imports/api/releasePlanMethods';
 
-dotenv.config({
-  path: Assets.absoluteFilePath('.env'),
-});
+if(Meteor.isDevelopment){
+  dotenv.config({
+    path: Assets.absoluteFilePath('.env'),
+  });
+}
 
 const axios = require('axios');
 
