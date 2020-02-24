@@ -1,7 +1,15 @@
+/* global Assets */
+"use strict"
 import { Meteor } from 'meteor/meteor';
+import dotenv from 'dotenv';
 import '../imports/api/currentMethods';
 import '../imports/api/historyMethods';
 import '../imports/api/boardsMethods';
+import '../imports/api/releasePlanMethods';
+
+dotenv.config({
+  path: Assets.absoluteFilePath('.env'),
+});
 
 const axios = require('axios');
 
