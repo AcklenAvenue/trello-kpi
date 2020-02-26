@@ -14,6 +14,10 @@ export default class TrelloReleasePlan extends React.Component {
             const buffer = new Uint8Array(Object.values(res));
             const blob = new Blob([buffer], {type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'});
             const url = window.URL.createObjectURL(blob);
+            const downButton = document.createElement('a');
+            downButton.setAttribute('href', url);
+            downButton.setAttribute('download', this.state.boardName);
+            downButton.click();
             this.setState({
               downloadUrl: url
             })
@@ -43,17 +47,11 @@ export default class TrelloReleasePlan extends React.Component {
                     </ul>
                 </div>
             </div>
-            <br></br>
-            <br></br>
-            {this.state.downloadUrl !== '' ?
-              (<div className="text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12" id="download-rp">
-                <a className="btn btn-success btn-lg btn-block" href={this.state.downloadUrl} download={this.state.boardName}>Download Release Plan</a>
-              </div>)
-              :
-              (<div className="text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12" id="generate-rp">
-                <button className="btn btn-success btn-lg btn-block">Generate Release Plan</button>
-              </div>)
-            }
+            <br/>
+            <br/>
+            <div className="text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12" id="generate-rp">
+              <button className="btn btn-success btn-lg btn-block">Generate Release Plan</button>
+            </div>
         </form>
       </div>
     );
