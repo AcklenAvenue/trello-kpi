@@ -1,7 +1,5 @@
 import React from 'react';
-import FileSaver from 'file-saver';
 import { Meteor } from 'meteor/meteor';
-import boards from '../../boards';
 
 export default class TrelloReleasePlan extends React.Component {
   onSubmit(e) {
@@ -25,9 +23,21 @@ export default class TrelloReleasePlan extends React.Component {
     }
   };
 
+  componentDidMount() {
+    Meteor.call('getAllBoards', (err, boards) => {
+      if(err){
+        throw err;
+      }
+      this.setState({
+        boards
+      });
+    })
+  }
+
   state = {
     boardName: '',
-    downloadUrl: ''
+    downloadUrl: '',
+    boards: []
   }
   
   
@@ -42,7 +52,7 @@ export default class TrelloReleasePlan extends React.Component {
                         &nbsp; <span className="caret"></span>
                     </button>
                     <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
-                        {boards.map((board, key) => <li key={key}><a className="dropdown-item" href="#" onClick={() => {this.setState({boardName: board.boardName, downloadUrl: ''})}}>{board.boardName}</a></li>)
+                        {this.state.boards.map((board, key) => <li key={key}><a className="dropdown-item" href="#" onClick={() => {this.setState({boardName: board.name, downloadUrl: ''})}}>{board.name}</a></li>)
                         }
                     </ul>
                 </div>
