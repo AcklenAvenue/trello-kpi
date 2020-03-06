@@ -20,5 +20,11 @@ export const Trello = {
   },
   generateReleasePlan(boardName) {
     return axios.get(`${process.env.RELEASE_PLAN_URL}/${boardName}`);
+  },
+  cycleTimes(){
+    return axios.get(`${process.env.TRELLO_METRICS_URL}/calculateCycleTime`);
+  },
+  timeInStates(){
+    return axios.get(`${process.env.TRELLO_METRICS_URL}/calculateCardTimeState`);
   }
 };

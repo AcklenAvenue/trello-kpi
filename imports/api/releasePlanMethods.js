@@ -17,5 +17,15 @@ Meteor.methods({
     const response = await db.query('select * from "Boards"');
     db.close();
     return response[0];
-  } 
+  },
+  
+  async cycleTimes(){
+    const response = await Trello.cycleTimes();
+    return response;
+  },
+
+  async timeInStates(){
+    const response = await Trello.timeInStates();
+    return response;
+  }
 });
