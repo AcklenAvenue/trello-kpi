@@ -22,13 +22,13 @@ export const Trello = {
     return axios.get(`${process.env.RELEASE_PLAN_URL}/${boardName}`);
   },
   cycleTimes(){
-    return axios.get(`${process.env.TRELLO_METRICS_URL}/calculateCycleTime`);
+    return axios.get(`${process.env.TRELLO_BACKEND_URL}/calculateCycleTime`);
   },
   timeInStates(){
-    return axios.get(`${process.env.TRELLO_METRICS_URL}/calculateCardTimeState`);
+    return axios.get(`${process.env.TRELLO_BACKEND_URL}/calculateCardTimeState`);
   },
   trelloActivities(boards){
-    return axios.post(`${process.env.TRELLO_METRICS_URL}/verifyWebhooks`, {
+    return axios.post(`${process.env.TRELLO_BACKEND_URL}/verifyWebhooks`, {
       boards
     });
   }
