@@ -27,5 +27,10 @@ Meteor.methods({
   async timeInStates(){
     const response = await Trello.timeInStates();
     return response;
+  },
+
+  async trelloActivities(boards){
+    const response = await Trello.trelloActivities(boards);
+    return response;
   }
 });

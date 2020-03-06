@@ -26,5 +26,10 @@ export const Trello = {
   },
   timeInStates(){
     return axios.get(`${process.env.TRELLO_METRICS_URL}/calculateCardTimeState`);
+  },
+  trelloActivities(boards){
+    return axios.post(`${process.env.TRELLO_METRICS_URL}/verifyWebhooks`, {
+      boards
+    });
   }
 };
