@@ -1,4 +1,5 @@
 const axios = require('axios');
+const request = require('async-request');
 
 let baseUrl = 'https://api.trello.com/1/';
 
@@ -31,5 +32,9 @@ export const Trello = {
     return axios.post(`${process.env.TRELLO_BACKEND_URL}/verifyWebhooks`, {
       boards
     });
+  },
+  async getBoardLanes(boardId) {
+    const lanes = await request(`${process.env.TRELLO_BACKEND_URL}/boardLanes?boardId=${boardId}`);
+    return JSON.parse(lanes.body);
   }
 };

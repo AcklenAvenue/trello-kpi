@@ -32,5 +32,10 @@ Meteor.methods({
   async trelloActivities(boards){
     const response = await Trello.trelloActivities(boards);
     return response;
+  },
+
+  async getBoardLanes(boardId){
+    const response = await Trello.getBoardLanes(boardId);
+    return response;
   }
 });
