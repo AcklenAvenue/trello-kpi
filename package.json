@@ -23,6 +23,6 @@
     "universal-cookie": "^2.1.0"
   },
   "engines": {
-    "node": "4.8.4"
+    "node": "12.22.5"
   }
 }
