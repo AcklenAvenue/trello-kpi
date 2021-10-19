@@ -1,7 +1,7 @@
 import React from "react";
 import { Link } from "react-router-dom";
 
-const NavBar = (props) => (
+const NavBar = () => (
   <nav className="navbar navbar-default">
     <div className="container-fluid">
       <div className="navbar-header">

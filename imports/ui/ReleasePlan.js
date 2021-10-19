@@ -1,17 +1,17 @@
-import React from 'react';
+import React from "react";
 
-import NavBar from './NavBar';
-import TrelloReleasePlan from './TrelloReleasePlan';
+import NavBar from "./NavBar";
+import TrelloReleasePlan from "./TrelloReleasePlan";
 
-const Boards = (props) => {
+const Boards = () => {
   return (
     <div>
-      <NavBar/>
+      <NavBar />
       <div id="main" className="text-center">
-          <h2>Release Plan</h2>
-          <TrelloReleasePlan/>
+        <h2>Release Plan</h2>
+        <TrelloReleasePlan />
       </div>
     </div>
-  )
-}
+  );
+};
 export default Boards;

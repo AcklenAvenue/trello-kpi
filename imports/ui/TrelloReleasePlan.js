@@ -1,11 +1,10 @@
 import React, { useEffect, useState } from "react";
 import { Meteor } from "meteor/meteor";
 
-const TrelloReleasePlan = (props) => {
-  const [state, setState] = useState({
-    boardName: "",
+const TrelloReleasePlan = () => {
+  const [boardInfo, setBoardInfo] = useState({
+    name: "",
     downloadUrl: "",
-    boards: [],
   });
   const [boards, setBoards] = useState([]);
 
@@ -14,17 +13,15 @@ const TrelloReleasePlan = (props) => {
       if (err) {
         throw err;
       }
-      
-      setBoards(
-        boards
-      );
+
+      setBoards(boards);
     });
   }, []);
 
   const onSubmit = (e) => {
     e.preventDefault();
-    if (state.boardName) {
-      Meteor.call("generateReleasePlan", state.boardName, (err, res) => {
+    if (boardInfo.name) {
+      Meteor.call("generateReleasePlan", boardInfo.name, (err, res) => {
         if (err) {
           throw err;
         }
@@ -35,14 +32,14 @@ const TrelloReleasePlan = (props) => {
         const url = window.URL.createObjectURL(blob);
         const downButton = document.createElement("a");
         downButton.setAttribute("href", url);
-        downButton.setAttribute("download", state.boardName);
+        downButton.setAttribute("download", boardInfo.name);
         downButton.click();
-        setState({
+        setBoardInfo({
           downloadUrl: url,
         });
       });
     }
-  }
+  };
 
   return (
     <div
@@ -60,29 +57,27 @@ const TrelloReleasePlan = (props) => {
               aria-haspopup="true"
               aria-expanded="true"
             >
-              {state.boardName ? state.boardName : "Select Board "}
+              {boardInfo.name ? boardInfo.name : "Select Board "}
               &nbsp; <span className="caret"></span>
             </button>
-            <ul
-              className="dropdown-menu"
-              aria-labelledby="dropdownMenuButton"
-            >
-              {boards && boards.map((board, key) => (
-                <li key={key}>
-                  <a
-                    className="dropdown-item"
-                    href="#"
-                    onClick={() => {
-                      setState({
-                        boardName: board.name,
-                        downloadUrl: "",
-                      });
-                    }}
-                  >
-                    {board.name}
-                  </a>
-                </li>
-              ))}
+            <ul className="dropdown-menu" aria-labelledby="dropdownMenuButton">
+              {boards &&
+                boards.map((board, key) => (
+                  <li key={key}>
+                    <a
+                      className="dropdown-item"
+                      href="#"
+                      onClick={() => {
+                        setBoardInfo({
+                          name: board.name,
+                          downloadUrl: "",
+                        });
+                      }}
+                    >
+                      {board.name}
+                    </a>
+                  </li>
+                ))}
             </ul>
           </div>
         </div>
@@ -99,6 +94,6 @@ const TrelloReleasePlan = (props) => {
       </form>
     </div>
   );
-}
+};
 
 export default TrelloReleasePlan;
