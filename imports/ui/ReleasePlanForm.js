@@ -6,7 +6,7 @@ const ReleasePlanMain = ({ onSubmit, boardInfo, boards, setBoardInfo }) => {
       className="col-lg-8 col-lg-offset-2 col-md-8 col-md-offset-2 col-sm-8 col-sm-offset-2 text-center"
       id="input"
     >
-      <form onSubmit={onSubmit}>
+      <form>
         <div className="input-group col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12">
           <div className="dropdown">
             <button
@@ -47,7 +47,7 @@ const ReleasePlanMain = ({ onSubmit, boardInfo, boards, setBoardInfo }) => {
           className="text-center col-lg-4 col-lg-offset-4 col-md-4 col-md-offset-4 col-sm-4 col-sm-offset-4 col-xs-12"
           id="generate-rp"
         >
-          <button className="btn btn-success btn-lg btn-block">
+          <button onClick={onSubmit} className="btn btn-success btn-lg btn-block">
             Generate Release Plan
           </button>
         </div>
