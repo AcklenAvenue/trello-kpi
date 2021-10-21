@@ -3,9 +3,6 @@
 import { Meteor } from "meteor/meteor";
 import dotenv from "dotenv";
 import axios from "axios";
-import "../imports/api/currentMethods";
-import "../imports/api/historyMethods";
-import "../imports/api/boardsMethods";
 import "../imports/api/releasePlanMethods";
 
 if (Meteor.isDevelopment) {

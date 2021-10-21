@@ -25,22 +25,7 @@ const NavBar = () => (
       >
         <ul className="nav navbar-nav navbar-right">
           <li>
-            <Link to="/">Current</Link>
-          </li>
-          <li>
-            <Link to="/history">History</Link>
-          </li>
-          <li>
-            <Link to="/boards">Boards</Link>
-          </li>
-          <li>
             <Link to="/release-plan">Release Plan</Link>
-          </li>
-          <li>
-            <Link to="/manual-updates">Manual Updates</Link>
-          </li>
-          <li>
-            <Link to="/instructions">Instructions</Link>
           </li>
         </ul>
       </div>

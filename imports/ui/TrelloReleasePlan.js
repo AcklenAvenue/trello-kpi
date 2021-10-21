@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from "react";
 import { Meteor } from "meteor/meteor";
-import ReleasePlanForm from './ReleasePlanForm';
+import ReleasePlanForm from "./ReleasePlanForm";
 
 const TrelloReleasePlan = () => {
   const [boardInfo, setBoardInfo] = useState({
@@ -42,7 +42,14 @@ const TrelloReleasePlan = () => {
     }
   };
 
-  return (<ReleasePlanForm { ...{onSubmit, boardInfo, boards, setBoardInfo }}/>);
+  return (
+    <ReleasePlanForm
+      onSubmit={onSubmit}
+      boardInfo={boardInfo}
+      boards={boards}
+      setBoardInfo={setBoardInfo}
+    />
+  );
 };
 
 export default TrelloReleasePlan;
