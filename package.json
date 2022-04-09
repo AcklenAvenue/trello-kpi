@@ -14,7 +14,7 @@
     "googleapis": "^88.2.0",
     "json2csv": "^3.11.1",
     "meteor-node-stubs": "^0.2.4",
-    "moment": "^2.19.2",
+    "moment": "^2.29.2",
     "pg": "^7.18.2",
     "query-string": "^6.11.0",
     "react": "^17.0.2",
